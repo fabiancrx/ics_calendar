@@ -255,6 +255,12 @@ export class App {
       day: 'Day',
       listWeek: 'List',
     },
+    datesSet: (info) => {
+      const now = new Date();
+      if (now >= info.start && now < info.end) {
+        this.calendarEl.getApi().scrollToTime(currentScrollTime());
+      }
+    },
     viewDidMount: (info) => {
       const key = VIEW_KEY_MAP[info.view.type];
       if (!key) return;
