@@ -1,0 +1,104 @@
+<div class="shell">
+  <header>
+    <span class="logo">ICS Today</span>
+    @if (icsUrl && !fetchFailed()) {
+      <a class="header-source" [href]="icsUrl" target="_blank" rel="noopener" [title]="icsUrl">
+        {{ icsUrlHost }} ↗
+      </a>
+    }
+  </header>
+
+  @if (!icsUrl || fetchFailed()) {
+    <form class="url-bar" (submit)="$event.preventDefault(); loadUrl()">
+      <input
+        class="url-input"
+        [class.url-input--error]="urlError()"
+        type="text"
+        inputmode="url"
+        enterkeyhint="go"
+        placeholder="https://example.com/calendar.ics"
+        [value]="urlDraft()"
+        (input)="urlDraft.set($any($event.target).value); urlError.set(false)"
+        spellcheck="false"
+        autocomplete="off"
+      />
+      @if (icsUrl) {
+        <a class="url-open" [href]="icsUrl" target="_blank" rel="noopener" title="Open source ICS">↗</a>
+      }
+      <button class="url-submit" type="submit">Load</button>
+    </form>
+    @if (urlError()) {
+      <p class="url-error">Enter a valid URL starting with https://</p>
+    }
+  }
+
+  @if (fetchFailed()) {
+    <div class="banner banner--error">
+      Failed to load the calendar. Check that the URL is reachable and returns a valid ICS file.
+    </div>
+  }
+
+  @if (!icsUrl) {
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h2>No calendar loaded</h2>
+      <p class="hint">Paste an ICS feed URL above and press Load.</p>
+    </div>
+  } @else {
+    <div class="calendar-card">
+      <full-calendar #calendar [options]="calendarOptions" />
+    </div>
+  }
+
+  @if (icsUrl && !fetchFailed()) {
+    <div class="url-footer">
+      <form class="url-bar" (submit)="$event.preventDefault(); loadUrl()">
+        <input
+          class="url-input"
+          [class.url-input--error]="urlError()"
+          type="text"
+          inputmode="url"
+          enterkeyhint="go"
+          placeholder="https://example.com/calendar.ics"
+          [value]="urlDraft()"
+          (input)="urlDraft.set($any($event.target).value); urlError.set(false)"
+          spellcheck="false"
+          autocomplete="off"
+        />
+        <a class="url-open" [href]="icsUrl" target="_blank" rel="noopener" title="Open source ICS">↗</a>
+        <button class="url-submit" type="submit">Load</button>
+      </form>
+      @if (urlError()) {
+        <p class="url-error">Enter a valid URL starting with https://</p>
+      }
+    </div>
+  }
+</div>
+
+@if (selectedEvent(); as ev) {
+  <div class="overlay" (click)="selectedEvent.set(null)" role="dialog" aria-modal="true">
+    <div class="event-card" (click)="$event.stopPropagation()">
+      <button class="event-card__close" (click)="selectedEvent.set(null)" aria-label="Close">✕</button>
+      <h3 class="event-card__title">{{ ev.title }}</h3>
+      <p class="event-card__time">{{ formatEventTime(ev) }}</p>
+
+      @if (ev.location) {
+        <div class="event-card__row">
+          <span class="event-card__label">Location</span>
+          <span>{{ ev.location }}</span>
+        </div>
+      }
+      @if (ev.description) {
+        <div class="event-card__row">
+          <span class="event-card__label">Description</span>
+          <span class="event-card__desc">{{ ev.description }}</span>
+        </div>
+      }
+      @if (ev.url) {
+        <a class="event-card__url" [href]="ev.url" target="_blank" rel="noopener">
+          Open link ↗
+        </a>
+      }
+    </div>
+  </div>
+}

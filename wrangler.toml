@@ -1,0 +1,2 @@
+name = "ics-today"
+pages_build_output_dir = "dist/ics-today/browser"
